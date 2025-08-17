@@ -36,8 +36,9 @@ router.post(
   isAuthenticated,
   new CreateCategoryController().handle,
 );
+// Corrija a rota de edição de categoria
 router.put(
-  "/category/edit",
+  "/category/edit/:category_id", // Adicione o parâmetro ':category_id'
   isAuthenticated,
   new EditCategoryController().handle,
 );
@@ -46,8 +47,9 @@ router.get(
   isAuthenticated,
   new ListCategoryController().handle,
 );
+// Corrija a rota de remoção de categoria
 router.delete(
-  "/category/remove",
+  "/category/remove/:category_id", // Adicione o parâmetro ':category_id'
   isAuthenticated,
   new RemoveCategoryController().handle,
 );

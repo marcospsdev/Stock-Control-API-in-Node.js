@@ -64,7 +64,7 @@
         }
       }
     },
-    "/v1/me?user_id={user_id}": {
+    "/v1/me/{user_id}": {
       "get": {
         "tags": ["Users"],
         "description": "Busca de um usuário por id",
@@ -79,8 +79,10 @@
             "in": "path",
             "description": "Id do usuário",
             "required": "true",
-            "type": "string",
-            "format": "uuid"
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         ],
         "responses": {
@@ -96,7 +98,7 @@
         }
       }
     },
-    "/v1/user/remove?user_id={user_id}": {
+    "/v1/user/remove/{user_id}": {
       "delete": {
         "tags": ["Users"],
         "description": "Remover usuário",
@@ -106,15 +108,19 @@
             "in": "path",
             "description": "Id do usuário",
             "required": "true",
-            "type": "string",
-            "format": "uuid"
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         ],
-        "200": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ResponseDeleteUser"
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseDeleteUser"
+                }
               }
             }
           }
@@ -153,7 +159,7 @@
         }
       }
     },
-    "/v1/category/edit?category_id={category_id}": {
+    "/v1/category/edit/{category_id}": {
       "put": {
         "tags": ["Categories"],
         "description": "Editar nome de uma categoria",
@@ -168,8 +174,10 @@
             "in": "path",
             "description": "Id da categoria",
             "required": "true",
-            "type": "string",
-            "format": "uuid"
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         ],
         "requestBody": {
@@ -217,7 +225,7 @@
         }
       }
     },
-    "/v1/category/remove?category_id={category_id}": {
+    "/v1/category/remove/{category_id}": {
       "delete": {
         "tags": ["Categories"],
         "description": "Remover uma categoria pelo id",
@@ -232,8 +240,10 @@
             "in": "path",
             "description": "Id da categoria",
             "required": "true",
-            "type": "string",
-            "format": "uuid"
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         ],
         "responses": {
@@ -313,7 +323,7 @@
         }
       }
     },
-    "/v1/product?category_id={category_id}": {
+    "/v1/product/{category_id}": {
       "get": {
         "tags": ["Products"],
         "description": "Busca de produto por category_id",
@@ -328,8 +338,10 @@
             "in": "path",
             "description": "Id da categoria",
             "required": "true",
-            "type": "string",
-            "format": "uuid"
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         ],
         "responses": {
@@ -367,7 +379,7 @@
         }
       }
     },
-    "/v1/product/remove?product_id={product_id}": {
+    "/v1/product/remove/{product_id}": {
       "delete": {
         "tags": ["Products"],
         "description": "Deleta um produto",
@@ -382,8 +394,10 @@
             "in": "path",
             "description": "Id do produto",
             "required": "true",
-            "type": "string",
-            "format": "uuid"
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         ],
         "responses": {
@@ -399,7 +413,7 @@
         }
       }
     },
-    "/v1/sale/product?product_id={product_id}": {
+    "/v1/sale/product/{product_id}": {
       "put": {
         "tags": ["Sales"],
         "description": "Efetuar venda de um produto",
@@ -414,8 +428,10 @@
             "in": "path",
             "description": "Id do produto",
             "required": "true",
-            "type": "string",
-            "format": "uuid"
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         ],
         "requestBody": {
@@ -442,7 +458,6 @@
       }
     }
   },
-
   "components": {
     "schemas": {
       "RequestCreateUser": {
@@ -525,12 +540,15 @@
       },
       "ResponseGetAllCategories": {
         "type": "array",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            }
           }
         }
       },
