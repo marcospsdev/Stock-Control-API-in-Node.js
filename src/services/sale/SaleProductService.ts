@@ -4,7 +4,7 @@ import { SaleProductRequest } from "../../models/interfaces/sale/SaleProductRequ
 class SaleProductService {
   async execute({ product_id, amount }: SaleProductRequest) {
     if (!product_id || !amount) {
-      throw new Error("Dados de entrada não foram passados corretamente!");
+      throw new Error("Input data was not passed correctly!");
     }
 
     const queryProduct = await prismaClient.product.findFirst({
@@ -30,7 +30,7 @@ class SaleProductService {
       });
       return saveSale;
     } else {
-      throw new Error("Não foi possível efetuar a venda!");
+      throw new Error("The sale could not be completed!");
     }
   }
 }

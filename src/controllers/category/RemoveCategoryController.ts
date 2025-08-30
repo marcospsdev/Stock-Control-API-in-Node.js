@@ -3,7 +3,7 @@ import { RemoveCategoryService } from "../../services/category/RemoveCategorySer
 
 class RemoveCategoryController {
   async handle(request: Request, response: Response) {
-    const { category_id } = request.params; // Correção aqui!
+    const { category_id } = request.params;
 
     const removeCategoryService = new RemoveCategoryService();
     const category = await removeCategoryService.execute({ category_id });

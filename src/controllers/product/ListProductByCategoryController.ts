@@ -3,14 +3,12 @@ import { ListProductByCategoryService } from "../../services/product/ListProduct
 
 class ListProductByCategoryController {
   async handle(request: Request, response: Response) {
-    const category_id = request.query.category_id as string;
+    const category_id = request.params.category_id as string;
     const listProductsByCategoryService = new ListProductByCategoryService();
-
     const products = await listProductsByCategoryService.execute({
       category_id,
     });
     return response.json(products);
   }
 }
-
 export { ListProductByCategoryController };

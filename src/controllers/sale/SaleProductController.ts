@@ -4,7 +4,7 @@ import { SaleProductRequest } from "../../models/interfaces/sale/SaleProductRequ
 
 class SaleProductController {
   async handle(request: Request, response: Response) {
-    const product_id = request.query.product_id as string;
+    const product_id = request.params.product_id as string;
     const { amount }: SaleProductRequest = request.body;
     const saleProductService = new SaleProductService();
 

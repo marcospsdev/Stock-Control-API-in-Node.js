@@ -30,12 +30,12 @@ app.use(
 
 app.get("/terms", (request: Request, response: Response) => {
   return response.json({
-    message: "Termos de serviço",
+    message: "Terms of Service",
   });
 });
 
 app.listen(port, () => {
   console.log(
-    "Servidor rodando na porta 3333 - Projeto Controle de Estoque curso NodeJs",
+    "Server running on port 3333 - Inventory Control Project in Node.js",
   );
 });

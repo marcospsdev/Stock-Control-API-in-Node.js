@@ -6,14 +6,14 @@ import { AuthRequest } from "../../models/interfaces/user/auth/AuthRequest";
 class AuthUserService {
   async execute({ email, password }: AuthRequest) {
     if (!email) {
-      throw new Error("Email precisa ser enviado!");
+      throw new Error("Email needs to be sent!");
     }
 
     if (!password) {
-      throw new Error("A senha precisa ser enviada!");
+      throw new Error("The password needs to be sent!");
     }
 
-    // Verificar no banco de dados se existe um usuário com o email passado
+    // Check the database to see if there is a user with the email address provided.
     const user = await prismaClient.user.findFirst({
       where: {
         email: email,
@@ -24,7 +24,7 @@ class AuthUserService {
       throw new Error("Wrong username or password!");
     }
 
-    // Verificar se a senha do usuário está correta
+    // Verify that the user's password is correct.
     const passwordMatch = await compare(password, user?.password);
 
     if (!passwordMatch) {

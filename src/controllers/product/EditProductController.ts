@@ -4,23 +4,20 @@ import { EditProductRequest } from "../../models/interfaces/product/EditProductR
 
 class EditProductController {
   async handle(request: Request, response: Response) {
-    const {
-      amount,
-      banner,
-      description,
-      name,
-      price,
-      product_id,
-    }: EditProductRequest = request.body;
+    const { product_id } = request.params;
+    const { amount, description, name, price }: EditProductRequest =
+      request.body;
+    const banner = request.file?.filename as string;
+
     const editProductService = new EditProductService();
 
-    const productEdited = editProductService.execute({
+    const productEdited = await editProductService.execute({
+      product_id,
       amount,
       banner,
       description,
       name,
       price,
-      product_id,
     });
     return response.json(productEdited);
   }

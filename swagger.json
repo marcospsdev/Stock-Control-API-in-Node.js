@@ -1,21 +1,186 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "API MP Controle de Estoque",
-    "description": "Esta API tem como objetivo o controle de estoque completo de seu negócio.",
+    "title": "Inventory Control API",
+    "description": "This API aims to provide complete inventory control.",
     "termsOfService": "http://localhost:3333/terms",
     "contact": {
       "email": "contato.marcosps@gmail.com"
     },
     "version": "1.0.0"
   },
+  "tags": [
+    {
+      "name": "Authentication",
+      "description": "System authentication service."
+    },
+    {
+      "name": "Users",
+      "description": "User services."
+    },
+    {
+      "name": "Categories",
+      "description": "Category services."
+    },
+    {
+      "name": "Products",
+      "description": "Product services."
+    },
+    {
+      "name": "Sales",
+      "description": "Product sales service."
+    }
+  ],
   "paths": {
+    "/v1/users": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "description": "List all users.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ResponseCreateUser"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/user/{user_id}": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "description": "Searches for user data by ID in the URL.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "description": "User ID to retrieve data.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseCreateUser"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "description": "Updates a user's data.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "description": "User ID to update.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "User data for updating.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestUpdateUser"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseCreateUser"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "description": "Deletes a specific user.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "description": "User ID.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseDeleteUser"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/user": {
       "post": {
-        "tags": ["Users"],
-        "description": "Criar usuário",
+        "tags": [
+          "Users"
+        ],
+        "description": "Create user.",
         "requestBody": {
-          "description": "Dados necessários para a criação de um novo usuário",
+          "description": "Data required to create a new user.",
           "content": {
             "application/json": {
               "schema": {
@@ -37,37 +202,12 @@
         }
       }
     },
-    "/v1/session": {
-      "post": {
-        "tags": ["Users"],
-        "description": "Logar e autenticar usuário",
-        "requestBody": {
-          "description": "Dados necessários para o login e autenticação de um usuário",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RequestAuthUser"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ResponseAuthUser"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1/me/{user_id}": {
-      "get": {
-        "tags": ["Users"],
-        "description": "Busca de um usuário por id",
+    "/v1/user/password/{user_id}": {
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "description": "Updates a user's password.",
         "security": [
           {
             "bearerAuth": []
@@ -77,14 +217,24 @@
           {
             "name": "user_id",
             "in": "path",
-            "description": "Id do usuário",
-            "required": "true",
+            "description": "User ID to update the password.",
+            "required": true,
             "schema": {
               "type": "string",
               "format": "uuid"
             }
           }
         ],
+        "requestBody": {
+          "description": "New password data for updating.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestUpdateUserPassword"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "content": {
@@ -98,115 +248,12 @@
         }
       }
     },
-    "/v1/user/remove/{user_id}": {
-      "delete": {
-        "tags": ["Users"],
-        "description": "Remover usuário",
-        "parameters": [
-          {
-            "name": "user_id",
-            "in": "path",
-            "description": "Id do usuário",
-            "required": "true",
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ResponseDeleteUser"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1/category": {
-      "post": {
-        "tags": ["Categories"],
-        "description": "Criar nova categoria",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "requestBody": {
-          "description": "Dados de entrada necessários para a criação de uma nova categoria",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RequestCreateCategory"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ResponseCreateCategory"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1/category/edit/{category_id}": {
-      "put": {
-        "tags": ["Categories"],
-        "description": "Editar nome de uma categoria",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "category_id",
-            "in": "path",
-            "description": "Id da categoria",
-            "required": "true",
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "description": "Dados de entrada necessários para editar o nome de uma categoria",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RequestCreateCategory"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ResponseCreateCategory"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1/category/all": {
+    "/v1/categories": {
       "get": {
-        "tags": ["Categories"],
-        "description": "Lista todas as categorias",
+        "tags": [
+          "Categories"
+        ],
+        "description": "List all categories.",
         "security": [
           {
             "bearerAuth": []
@@ -225,10 +272,46 @@
         }
       }
     },
-    "/v1/category/remove/{category_id}": {
-      "delete": {
-        "tags": ["Categories"],
-        "description": "Remover uma categoria pelo id",
+    "/v1/category": {
+      "post": {
+        "tags": [
+          "Categories"
+        ],
+        "description": "Create new category.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "description": "Input data required for creating a new category.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestCreateCategory"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseCreateCategory"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/category/{category_id}": {
+      "put": {
+        "tags": [
+          "Categories"
+        ],
+        "description": "Edit a category name.",
         "security": [
           {
             "bearerAuth": []
@@ -238,8 +321,52 @@
           {
             "name": "category_id",
             "in": "path",
-            "description": "Id da categoria",
-            "required": "true",
+            "description": "Category ID.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Input data required to edit a category name.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestCreateCategory"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseCreateCategory"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Categories"
+        ],
+        "description": "Delete a category by id.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "category_id",
+            "in": "path",
+            "description": "Category ID.",
+            "required": true,
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -259,17 +386,199 @@
         }
       }
     },
+    "/v1/products": {
+      "get": {
+        "tags": [
+          "Products"
+        ],
+        "description": "Search all products.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ResponseCreateProduct"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/products/{category_id}": {
+      "get": {
+        "tags": [
+          "Products"
+        ],
+        "description": "Search for product by category ID.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "category_id",
+            "in": "path",
+            "description": "Category ID",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ResponseCreateProduct"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/product/{product_id}": {
+      "get": {
+        "tags": [
+          "Products"
+        ],
+        "description": "Search for a product by ID.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "path",
+            "description": "Product ID to search for.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseCreateProduct"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Products"
+        ],
+        "description": "Edit product by ID.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "path",
+            "description": "ID of the product to be edited.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Input data required to edit a product.",
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestEditProduct"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseCreateProduct"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Products"
+        ],
+        "description": "Delete a product.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "query",
+            "description": "Product ID.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseCreateProduct"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/product": {
       "post": {
-        "tags": ["Products"],
-        "description": "Criar produto",
+        "tags": [
+          "Products"
+        ],
+        "description": "Create product.",
         "security": [
           {
             "bearerAuth": []
           }
         ],
         "requestBody": {
-          "description": "Dados necessários para a criação de um produto",
+          "description": "Data required for product creation.",
           "content": {
             "multipart/form-data": {
               "schema": {
@@ -291,98 +600,12 @@
         }
       }
     },
-    "/v1/product/edit": {
+    "/v1/sale/{product_id}": {
       "put": {
-        "tags": ["Products"],
-        "description": "Editar produto por id",
-        "security": [
-          {
-            "bearerAuth": []
-          }
+        "tags": [
+          "Sales"
         ],
-        "requestBody": {
-          "description": "Dados de entrada necessários para editar um produto",
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "$ref": "#/components/schemas/RequestEditProduct"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ResponseDeleteUser"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1/product/{category_id}": {
-      "get": {
-        "tags": ["Products"],
-        "description": "Busca de produto por category_id",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "category_id",
-            "in": "path",
-            "description": "Id da categoria",
-            "required": "true",
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ResponseCreateProduct"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1/products": {
-      "get": {
-        "tags": ["Products"],
-        "description": "Busca todos os products",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ResponseSaleProduct"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1/product/remove/{product_id}": {
-      "delete": {
-        "tags": ["Products"],
-        "description": "Deleta um produto",
+        "description": "Sell a product.",
         "security": [
           {
             "bearerAuth": []
@@ -392,42 +615,8 @@
           {
             "name": "product_id",
             "in": "path",
-            "description": "Id do produto",
-            "required": "true",
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ResponseCreateProduct"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1/sale/product/{product_id}": {
-      "put": {
-        "tags": ["Sales"],
-        "description": "Efetuar venda de um produto",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "product_id",
-            "in": "path",
-            "description": "Id do produto",
-            "required": "true",
+            "description": "Product ID.",
+            "required": true,
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -435,7 +624,7 @@
           }
         ],
         "requestBody": {
-          "description": "Dados de entrada necessários para efetuar a venda de um produto",
+          "description": "Input data required to sell a product.",
           "content": {
             "application/json": {
               "schema": {
@@ -450,6 +639,35 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ResponseSaleProduct"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/sign-in": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "description": "Sign-in and authenticate user.",
+        "requestBody": {
+          "description": "Data required for user sign-in and authentication.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestAuthUser"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseAuthUser"
                 }
               }
             }
@@ -654,18 +872,34 @@
             "type": "string",
             "format": "binary"
           },
-          "product_id": {
-            "type": "string"
-          },
           "amount": {
             "type": "number"
+          }
+        }
+      },
+      "RequestUpdateUser": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          }
+        }
+      },
+      "RequestUpdateUserPassword": {
+        "type": "object",
+        "properties": {
+          "password": {
+            "type": "string"
           }
         }
       }
     },
     "securitySchemes": {
       "bearerAuth": {
-        "description": "Autentificação utilizando JWT",
+        "description": "Authentication using JWT.",
         "type": "http",
         "scheme": "bearer",
         "bearerFormat": "JWT"
