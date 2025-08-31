@@ -5,8 +5,10 @@ class RemoveUserController {
   async handle(request: Request, response: Response) {
     const user_id = request.params.user_id as string;
     const removeUserService = new RemoveUserService();
-    const removeUser = removeUserService.execute({ user_id });
+    const removeUser = await removeUserService.execute({ user_id });
+
     return response.json(removeUser);
   }
 }
+
 export { RemoveUserController };

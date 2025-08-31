@@ -7,6 +7,7 @@ class ListUsersService {
         id: true,
         name: true,
         email: true,
+        user_type_id: true,
       },
     });
 

@@ -3,7 +3,7 @@ import { hash } from "bcryptjs";
 import { UserRequest } from "../../models/interfaces/user/UserRequest";
 
 class CreateUserService {
-  async execute({ name, email, password }: UserRequest) {
+  async execute({ name, email, password, user_type_id }: UserRequest) {
     if (!email) {
       throw new Error("Email incorrect");
     }
@@ -27,11 +27,13 @@ class CreateUserService {
         name: name,
         email: email,
         password: passwordHash,
+        user_type_id: user_type_id, // Agora salvamos o user_type_id no banco de dados
       },
       select: {
         id: true,
         name: true,
         email: true,
+        user_type_id: true, // Retornamos o user_type_id na resposta
       },
     });
 

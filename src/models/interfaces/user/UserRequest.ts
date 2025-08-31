@@ -1,6 +1,6 @@
 export interface UserRequest {
-  id?: string;
   name: string;
   email: string;
   password: string;
+  user_type_id: string;
 }
