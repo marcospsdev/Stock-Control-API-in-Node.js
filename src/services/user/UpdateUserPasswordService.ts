@@ -21,6 +21,7 @@ class UpdateUserPasswordService {
         id: true,
         name: true,
         email: true,
+        user_type_id: true,
       },
     });
 
