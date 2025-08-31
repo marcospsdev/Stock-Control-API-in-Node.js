@@ -1,7 +1,7 @@
 import { Router, Request, Response } from "express";
 import multer from "multer";
 import uploadConfig from "./config/multer";
-import { isAuthenticated } from "./middlewares/isAuthenticated";
+import { isAuthenticated, can, USER_TYPES } from "./middlewares/permissions";
 import { AuthUserController } from "./controllers/user/AuthUserController";
 import { ListUsersController } from "./controllers/user/ListUsersController";
 import { DetailUserController } from "./controllers/user/DetailUserController";
@@ -32,62 +32,106 @@ router.get("/test", (request: Request, response: Response) => {
 router.post("/sign-in", new AuthUserController().handle);
 
 // User Routes
-router.get("/users", isAuthenticated, new ListUsersController().handle);
-router.get("/user/:user_id", new DetailUserController().handle);
-router.post("/user", new CreateUserController().handle);
-router.put("/user/:user_id", isAuthenticated, new EditUserController().handle);
+router.post(
+  "/user",
+  isAuthenticated,
+  can(USER_TYPES.ADMIN),
+  new CreateUserController().handle,
+);
+router.get(
+  "/users",
+  isAuthenticated,
+  can(USER_TYPES.ADMIN),
+  new ListUsersController().handle,
+);
+router.get(
+  "/user/:user_id",
+  isAuthenticated,
+  can(USER_TYPES.ADMIN),
+  new DetailUserController().handle,
+);
+router.put(
+  "/user/:user_id",
+  isAuthenticated,
+  can(USER_TYPES.ADMIN),
+  new EditUserController().handle,
+);
 router.put(
   "/user/password/:user_id",
   isAuthenticated,
+  can(USER_TYPES.ADMIN),
   new UpdateUserPasswordController().handle,
 );
-router.delete("/user/:user_id", new RemoveUserController().handle);
+router.delete(
+  "/user/:user_id",
+  isAuthenticated,
+  can(USER_TYPES.ADMIN),
+  new RemoveUserController().handle,
+);
 
 // Category Routes
-router.get("/categories", isAuthenticated, new ListCategoryController().handle);
+router.get(
+  "/categories",
+  isAuthenticated,
+  can(USER_TYPES.ADMIN, USER_TYPES.OPERATOR, USER_TYPES.SELLER),
+  new ListCategoryController().handle,
+);
 router.post(
   "/category",
   isAuthenticated,
+  can(USER_TYPES.ADMIN, USER_TYPES.OPERATOR),
   new CreateCategoryController().handle,
 );
 router.put(
   "/category/:category_id",
   isAuthenticated,
+  can(USER_TYPES.ADMIN, USER_TYPES.OPERATOR),
   new EditCategoryController().handle,
 );
 router.delete(
   "/category/:category_id",
   isAuthenticated,
+  can(USER_TYPES.ADMIN, USER_TYPES.OPERATOR),
   new RemoveCategoryController().handle,
 );
 
 // Product Routes
-router.get("/products", isAuthenticated, new ListProductsController().handle);
+router.get(
+  "/products",
+  isAuthenticated,
+  can(USER_TYPES.ADMIN, USER_TYPES.OPERATOR, USER_TYPES.SELLER),
+  new ListProductsController().handle,
+);
 router.get(
   "/product/:product_id",
   isAuthenticated,
+  can(USER_TYPES.ADMIN, USER_TYPES.OPERATOR, USER_TYPES.SELLER),
   new DetailProductController().handle,
 );
 router.get(
   "/products/:category_id",
   isAuthenticated,
+  can(USER_TYPES.ADMIN, USER_TYPES.OPERATOR, USER_TYPES.SELLER),
   new ListProductByCategoryController().handle,
 );
 router.post(
   "/product",
   isAuthenticated,
+  can(USER_TYPES.ADMIN, USER_TYPES.OPERATOR),
   upload.single("file"),
   new CreateProductController().handle,
 );
 router.put(
   "/product/:product_id",
   isAuthenticated,
+  can(USER_TYPES.ADMIN, USER_TYPES.OPERATOR),
   upload.single("file"),
   new EditProductController().handle,
 );
 router.delete(
-  "/product/remove/:product_id",
+  "/product/:product_id",
   isAuthenticated,
+  can(USER_TYPES.ADMIN, USER_TYPES.OPERATOR),
   new RemoveProductController().handle,
 );
 
@@ -95,6 +139,7 @@ router.delete(
 router.put(
   "/sale/:product_id",
   isAuthenticated,
+  can(USER_TYPES.ADMIN, USER_TYPES.OPERATOR, USER_TYPES.SELLER),
   new SaleProductController().handle,
 );
 

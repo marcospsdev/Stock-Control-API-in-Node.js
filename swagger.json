@@ -16,19 +16,19 @@
     },
     {
       "name": "Users",
-      "description": "User services."
+      "description": "User services. **Accessible only to Administrators.**"
     },
     {
       "name": "Categories",
-      "description": "Category services."
+      "description": "Category services. **Accessible to Administrators and Operators.**"
     },
     {
       "name": "Products",
-      "description": "Product services."
+      "description": "Product services. **Accessible to Administrators and Operators.**"
     },
     {
       "name": "Sales",
-      "description": "Product sales service."
+      "description": "Product sales service. **Accessible to Administrators, Operators, and Sellers.**"
     }
   ],
   "paths": {
@@ -37,7 +37,7 @@
         "tags": [
           "Users"
         ],
-        "description": "List all users.",
+        "description": "List all users. **Accessible only to Administrators.**",
         "security": [
           {
             "bearerAuth": []
@@ -64,7 +64,7 @@
         "tags": [
           "Users"
         ],
-        "description": "Searches for user data by ID in the URL.",
+        "description": "Searches for user data by ID in the URL. **Accessible only to Administrators.**",
         "security": [
           {
             "bearerAuth": []
@@ -98,7 +98,7 @@
         "tags": [
           "Users"
         ],
-        "description": "Updates a user's data.",
+        "description": "Updates a user's data. **Accessible only to Administrators.**",
         "security": [
           {
             "bearerAuth": []
@@ -142,7 +142,7 @@
         "tags": [
           "Users"
         ],
-        "description": "Deletes a specific user.",
+        "description": "Deletes a specific user. **Accessible only to Administrators.**",
         "security": [
           {
             "bearerAuth": []
@@ -178,7 +178,12 @@
         "tags": [
           "Users"
         ],
-        "description": "Create user.",
+        "description": "Create user. **Accessible only to Administrators.**",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "requestBody": {
           "description": "Data required to create a new user.",
           "content": {
@@ -207,7 +212,7 @@
         "tags": [
           "Users"
         ],
-        "description": "Updates a user's password.",
+        "description": "Updates a user's password. **Accessible only to Administrators.**",
         "security": [
           {
             "bearerAuth": []
@@ -253,7 +258,7 @@
         "tags": [
           "Categories"
         ],
-        "description": "List all categories.",
+        "description": "List all categories. **Accessible to Administrators, Operators, and Sellers.**",
         "security": [
           {
             "bearerAuth": []
@@ -277,7 +282,7 @@
         "tags": [
           "Categories"
         ],
-        "description": "Create new category.",
+        "description": "Create new category. **Accessible to Administrators and Operators.**",
         "security": [
           {
             "bearerAuth": []
@@ -311,7 +316,7 @@
         "tags": [
           "Categories"
         ],
-        "description": "Edit a category name.",
+        "description": "Edit a category name. **Accessible to Administrators and Operators.**",
         "security": [
           {
             "bearerAuth": []
@@ -355,7 +360,7 @@
         "tags": [
           "Categories"
         ],
-        "description": "Delete a category by id.",
+        "description": "Delete a category by id. **Accessible to Administrators and Operators.**",
         "security": [
           {
             "bearerAuth": []
@@ -391,7 +396,7 @@
         "tags": [
           "Products"
         ],
-        "description": "Search all products.",
+        "description": "Search all products. **Accessible to Administrators, Operators, and Sellers.**",
         "security": [
           {
             "bearerAuth": []
@@ -418,7 +423,7 @@
         "tags": [
           "Products"
         ],
-        "description": "Search for product by category ID.",
+        "description": "Search for product by category ID. **Accessible to Administrators, Operators, and Sellers.**",
         "security": [
           {
             "bearerAuth": []
@@ -457,7 +462,7 @@
         "tags": [
           "Products"
         ],
-        "description": "Search for a product by ID.",
+        "description": "Search for a product by ID. **Accessible to Administrators, Operators, and Sellers.**",
         "security": [
           {
             "bearerAuth": []
@@ -491,7 +496,7 @@
         "tags": [
           "Products"
         ],
-        "description": "Edit product by ID.",
+        "description": "Edit product by ID. **Accessible to Administrators and Operators.**",
         "security": [
           {
             "bearerAuth": []
@@ -535,7 +540,7 @@
         "tags": [
           "Products"
         ],
-        "description": "Delete a product.",
+        "description": "Delete a product. **Accessible to Administrators and Operators.**",
         "security": [
           {
             "bearerAuth": []
@@ -544,7 +549,7 @@
         "parameters": [
           {
             "name": "product_id",
-            "in": "query",
+            "in": "path",
             "description": "Product ID.",
             "required": true,
             "schema": {
@@ -571,7 +576,7 @@
         "tags": [
           "Products"
         ],
-        "description": "Create product.",
+        "description": "Create product. **Accessible to Administrators and Operators.**",
         "security": [
           {
             "bearerAuth": []
@@ -605,7 +610,7 @@
         "tags": [
           "Sales"
         ],
-        "description": "Sell a product.",
+        "description": "Sell a product. **Accessible to Administrators, Operators, and Sellers.**",
         "security": [
           {
             "bearerAuth": []
@@ -651,7 +656,7 @@
         "tags": [
           "Authentication"
         ],
-        "description": "Sign-in and authenticate user.",
+        "description": "Sign-in and authenticate user. **No authentication required.**",
         "requestBody": {
           "description": "Data required for user sign-in and authentication.",
           "content": {
@@ -689,8 +694,14 @@
           },
           "password": {
             "type": "string"
+          },
+          "user_type_id": {
+            "type": "string",
+            "description": "ID of the user type (e.g., Administrator, Operator, Seller).",
+            "example": "af77c7f3-c5b9-4a99-b145-c6328a6f8745"
           }
-        }
+        },
+        "required": ["name", "email", "password", "user_type_id"]
       },
       "ResponseCreateUser": {
         "type": "object",
@@ -702,6 +713,9 @@
             "type": "string"
           },
           "email": {
+            "type": "string"
+          },
+          "user_type_id": {
             "type": "string"
           }
         }
@@ -728,6 +742,10 @@
           },
           "email": {
             "type": "string"
+          },
+          "user_type_id": {
+            "type": "string",
+            "description": "ID of the authenticated user's type."
           },
           "token": {
             "type": "string"
@@ -885,6 +903,11 @@
           },
           "email": {
             "type": "string"
+          },
+          "user_type_id": {
+            "type": "string",
+            "description": "ID of the user type (e.g., Administrator, Operator, Seller).",
+            "example": "af77c7f3-c5b9-4a99-b145-c6328a6f8745"
           }
         }
       },

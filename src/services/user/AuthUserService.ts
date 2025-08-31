@@ -18,6 +18,9 @@ class AuthUserService {
       where: {
         email: email,
       },
+      include: {
+        user_type: true,
+      },
     });
 
     if (!user) {
@@ -25,7 +28,7 @@ class AuthUserService {
     }
 
     // Verify that the user's password is correct.
-    const passwordMatch = await compare(password, user?.password);
+    const passwordMatch = await compare(password, user.password);
 
     if (!passwordMatch) {
       throw new Error("Wrong password!");
@@ -33,20 +36,22 @@ class AuthUserService {
 
     const token = sign(
       {
-        name: user?.name,
-        email: user?.email,
+        name: user.name,
+        email: user.email,
+        user_type_id: user.user_type_id,
       },
       process.env.JWT_SECRET as string,
       {
-        subject: user?.id,
+        subject: user.user_type_id,
         expiresIn: "30d",
       },
     );
 
     return {
-      id: user?.id,
-      name: user?.name,
-      email: user?.email,
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      user_type_id: user.user_type_id,
       token: token,
     };
   }

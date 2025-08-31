@@ -13,13 +13,25 @@ datasource db {
 model User {
   id       String @id @default(uuid())
   name     String
-  email    String
+  email    String @unique
   password String
 
   created_at DateTime? @default(now())
   updated_at DateTime? @default(now())
 
+  user_type    UserType @relation(fields: [user_type_id], references: [id])
+  user_type_id String
+
   @@map("users")
+}
+
+model UserType {
+  id   String @id @default(uuid())
+  name String @unique
+
+  users User[]
+
+  @@map("user_types")
 }
 
 model Category {

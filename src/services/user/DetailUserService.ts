@@ -11,6 +11,7 @@ class DetailUserService {
           id: true,
           name: true,
           email: true,
+          user_type_id: true,
         },
       });
       return user;
