@@ -6,6 +6,7 @@ import {
   ToolResultContentBlock,
 } from "@aws-sdk/client-bedrock-runtime";
 import { BEDROCK_MODEL_ID, BEDROCK_REGION, getBedrockClient } from "../../ai/bedrockClient";
+import { friendlyBedrockError } from "../../ai/bedrockErrors";
 import { STOCK_TOOLS, runStockTool } from "../../ai/stockTools";
 
 export interface ChatMessage {
@@ -44,24 +45,6 @@ const validateMessages = (messages: unknown): ChatMessage[] => {
     throw new Error("The last message must be from the user.");
   }
   return history;
-};
-
-const friendlyBedrockError = (error: unknown) => {
-  const name = (error as { name?: string })?.name ?? "";
-  const message = (error as { message?: string })?.message ?? "";
-  if (name === "CredentialsProviderError" || /credential/i.test(message)) {
-    return "AI is not configured: AWS credentials were not found. Fill in .env.aws (see .env.aws.example).";
-  }
-  if (name === "ValidationException" && /operation not allowed/i.test(message)) {
-    return "AI is unavailable: the Bedrock quotas for this AWS account are still 0 (Operation not allowed).";
-  }
-  if (name === "AccessDeniedException") {
-    return "AI is unavailable: the AWS credentials do not have permission to invoke this Bedrock model.";
-  }
-  if (name === "ThrottlingException") {
-    return "AI is busy: too many requests to Bedrock. Try again in a few seconds.";
-  }
-  return `AI request failed: ${name || "Error"}${message ? ` - ${message}` : ""}`;
 };
 
 class StockAssistantService {

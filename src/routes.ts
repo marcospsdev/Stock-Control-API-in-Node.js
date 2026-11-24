@@ -23,9 +23,11 @@ import { SaleProductController } from "./controllers/sale/SaleProductController"
 import { ListSalesController } from "./controllers/sale/ListSalesController";
 import { RemoveSaleController } from "./controllers/sale/RemoveSaleController";
 import { StockAssistantController } from "./controllers/ai/StockAssistantController";
+import { ProductSuggestionController } from "./controllers/ai/ProductSuggestionController";
 
 const router = Router();
 const upload = multer(uploadConfig.upload("./tmp"));
+const uploadToMemory = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } });
 
 router.get("/test", (request: Request, response: Response) => {
   return response.json({ ok: true });
@@ -164,6 +166,13 @@ router.post(
   isAuthenticated,
   can(USER_TYPES.ADMIN, USER_TYPES.OPERATOR, USER_TYPES.SELLER),
   new StockAssistantController().handle,
+);
+router.post(
+  "/ai/product-suggestion",
+  isAuthenticated,
+  can(USER_TYPES.ADMIN, USER_TYPES.OPERATOR),
+  uploadToMemory.single("file"),
+  new ProductSuggestionController().handle,
 );
 
 export { router };

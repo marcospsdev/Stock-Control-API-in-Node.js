@@ -718,6 +718,56 @@
         }
       }
     },
+    "/v1/ai/product-suggestion": {
+      "post": {
+        "tags": [
+          "AI"
+        ],
+        "description": "Suggests the product name, description and category from a product photo, using a Bedrock vision model (default Amazon Nova Lite). Nothing is saved: the front-end fills the form and the user reviews it. **Accessible to Administrators and Operators.**",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "JPG, PNG, WEBP or GIF up to 3.75 MB."
+                  },
+                  "hint": {
+                    "type": "string",
+                    "description": "Optional extra information for the AI (up to 300 characters)."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseProductSuggestion"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing or unsupported image, missing AWS credentials, Bedrock quotas at 0 or Bedrock error. The body is { error }."
+          }
+        }
+      }
+    },
     "/v1/sales": {
       "get": {
         "tags": [
@@ -1067,6 +1117,50 @@
             "example": [
               "list_products"
             ]
+          },
+          "usage": {
+            "type": "object",
+            "properties": {
+              "inputTokens": {
+                "type": "number"
+              },
+              "outputTokens": {
+                "type": "number"
+              }
+            }
+          }
+        }
+      },
+      "ResponseProductSuggestion": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "category_id": {
+            "type": "string",
+            "nullable": true,
+            "description": "Existing category chosen by the AI, or null."
+          },
+          "category_name": {
+            "type": "string",
+            "nullable": true
+          },
+          "new_category_name": {
+            "type": "string",
+            "nullable": true,
+            "description": "Suggested new category when none of the existing ones fits."
+          },
+          "model": {
+            "type": "string",
+            "example": "us.amazon.nova-lite-v1:0"
+          },
+          "region": {
+            "type": "string",
+            "example": "us-east-2"
           },
           "usage": {
             "type": "object",
