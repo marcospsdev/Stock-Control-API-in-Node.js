@@ -20,6 +20,8 @@ import { ListProductByCategoryController } from "./controllers/product/ListProdu
 import { ListProductsController } from "./controllers/product/ListProductsController";
 import { RemoveProductController } from "./controllers/product/RemoveProductController";
 import { SaleProductController } from "./controllers/sale/SaleProductController";
+import { ListSalesController } from "./controllers/sale/ListSalesController";
+import { RemoveSaleController } from "./controllers/sale/RemoveSaleController";
 
 const router = Router();
 const upload = multer(uploadConfig.upload("./tmp"));
@@ -141,6 +143,18 @@ router.put(
   isAuthenticated,
   can(USER_TYPES.ADMIN, USER_TYPES.OPERATOR, USER_TYPES.SELLER),
   new SaleProductController().handle,
+);
+router.get(
+  "/sales",
+  isAuthenticated,
+  can(USER_TYPES.ADMIN, USER_TYPES.OPERATOR, USER_TYPES.SELLER),
+  new ListSalesController().handle,
+);
+router.delete(
+  "/sales/:sale_id",
+  isAuthenticated,
+  can(USER_TYPES.ADMIN, USER_TYPES.OPERATOR),
+  new RemoveSaleController().handle,
 );
 
 export { router };

@@ -58,8 +58,23 @@ model Product {
   category    Category @relation(fields: [category_id], references: [id])
   category_id String
   items       Item[]
+  sales       Sale[]
 
   @@map("products")
+}
+
+model Sale {
+  id           String   @id @default(uuid())
+  product_name String
+  unit_price   String
+  amount       Int
+  total        Float
+  created_at   DateTime @default(now())
+
+  product    Product? @relation(fields: [product_id], references: [id], onDelete: SetNull)
+  product_id String?
+
+  @@map("sales")
 }
 
 model Item {

@@ -15,20 +15,32 @@ class SaleProductService {
 
     if (queryProduct?.amount > amount && amount > 0) {
       const newAmount = queryProduct?.amount - amount;
-      const saveSale = await prismaClient.product.update({
-        where: {
-          id: product_id,
-        },
-        data: {
-          amount: newAmount,
-        },
-        select: {
-          id: true,
-          name: true,
-          amount: true,
-        },
-      });
-      return saveSale;
+      const unitPrice = Number(String(queryProduct.price).replace(",", ".")) || 0;
+      const [saveSale, sale] = await prismaClient.$transaction([
+        prismaClient.product.update({
+          where: {
+            id: product_id,
+          },
+          data: {
+            amount: newAmount,
+          },
+          select: {
+            id: true,
+            name: true,
+            amount: true,
+          },
+        }),
+        prismaClient.sale.create({
+          data: {
+            product_id,
+            product_name: queryProduct.name,
+            unit_price: queryProduct.price,
+            amount,
+            total: Math.round(unitPrice * amount * 100) / 100,
+          },
+        }),
+      ]);
+      return { ...saveSale, sale };
     } else {
       throw new Error("The sale could not be completed!");
     }

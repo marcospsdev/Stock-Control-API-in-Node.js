@@ -38,6 +38,29 @@
           "Users"
         ],
         "description": "List all users. **Accessible only to Administrators.**",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "description": "Page number (starts at 1). When page or limit is sent, the response is paginated: { data, total, page, limit, totalPages }. Without them, the full list is returned as before.",
+            "schema": { "type": "integer" }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Items per page (default 10, max 100).",
+            "schema": { "type": "integer" }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "description": "Filters by name or e-mail. The paginated response also includes countsByType { user_type_id: total }.",
+            "schema": { "type": "string" }
+          }
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -259,6 +282,29 @@
           "Categories"
         ],
         "description": "List all categories. **Accessible to Administrators, Operators, and Sellers.**",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "description": "Page number (starts at 1). When page or limit is sent, the response is paginated: { data, total, page, limit, totalPages }. Without them, the full list is returned as before.",
+            "schema": { "type": "integer" }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Items per page (default 10, max 100).",
+            "schema": { "type": "integer" }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "description": "Filters by name.",
+            "schema": { "type": "string" }
+          }
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -397,6 +443,36 @@
           "Products"
         ],
         "description": "Search all products. **Accessible to Administrators, Operators, and Sellers.**",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "description": "Page number (starts at 1). When page or limit is sent, the response is paginated: { data, total, page, limit, totalPages }. Without them, the full list is returned as before.",
+            "schema": { "type": "integer" }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Items per page (default 10, max 100).",
+            "schema": { "type": "integer" }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "description": "Filters by name.",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "category_id",
+            "in": "query",
+            "required": false,
+            "description": "Filters by category.",
+            "schema": { "type": "string" }
+          }
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -605,6 +681,95 @@
         }
       }
     },
+    "/v1/sales": {
+      "get": {
+        "tags": [
+          "Sales"
+        ],
+        "description": "List the sales history, most recent first. Always paginated (default page 1, limit 10). **Accessible to Administrators, Operators, and Sellers.**",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "description": "Page number (starts at 1).",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Items per page (default 10, max 100).",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "description": "Filters by product name.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseListSales"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/sales/{sale_id}": {
+      "delete": {
+        "tags": [
+          "Sales"
+        ],
+        "description": "Remove one sale from the history. The product stock is not changed. **Accessible to Administrators and Operators.**",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "sale_id",
+            "in": "path",
+            "description": "Sale ID.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Sale"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/sale/{product_id}": {
       "put": {
         "tags": [
@@ -804,6 +969,98 @@
           }
         }
       },
+      "Sale": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "product_id": {
+            "type": "string",
+            "nullable": true,
+            "description": "Null when the product was removed."
+          },
+          "product_name": {
+            "type": "string"
+          },
+          "unit_price": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ResponseListSales": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/Sale"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "product": {
+                      "type": "object",
+                      "nullable": true,
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "banner": {
+                          "type": "string"
+                        },
+                        "category": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "total": {
+            "type": "number"
+          },
+          "page": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "totalPages": {
+            "type": "number"
+          },
+          "totalRevenue": {
+            "type": "number",
+            "description": "Sum of the totals of the filtered sales."
+          },
+          "totalUnits": {
+            "type": "number",
+            "description": "Units sold in the filtered sales."
+          }
+        }
+      },
       "ResponseSaleProduct": {
         "type": "object",
         "properties": {
@@ -815,6 +1072,9 @@
           },
           "amount": {
             "type": "number"
+          },
+          "sale": {
+            "$ref": "#/components/schemas/Sale"
           }
         }
       },
