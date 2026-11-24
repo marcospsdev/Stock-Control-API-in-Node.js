@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { EditProductService } from "../../services/product/EditProductService";
 import { EditProductRequest } from "../../models/interfaces/product/EditProductRequest";
+import { ProductEmbeddingService } from "../../services/ai/ProductEmbeddingService";
 
 class EditProductController {
   async handle(request: Request, response: Response) {
@@ -19,6 +20,7 @@ class EditProductController {
       name,
       price,
     });
+    ProductEmbeddingService.refreshInBackground(productEdited.id);
     return response.json(productEdited);
   }
 }

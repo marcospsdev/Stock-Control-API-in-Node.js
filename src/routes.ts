@@ -25,6 +25,7 @@ import { RemoveSaleController } from "./controllers/sale/RemoveSaleController";
 import { StockAssistantController } from "./controllers/ai/StockAssistantController";
 import { ProductSuggestionController } from "./controllers/ai/ProductSuggestionController";
 import { SalesInsightsController } from "./controllers/ai/SalesInsightsController";
+import { SemanticSearchController } from "./controllers/ai/SemanticSearchController";
 import { RestockForecastController } from "./controllers/sale/RestockForecastController";
 
 const router = Router();
@@ -187,6 +188,24 @@ router.post(
   isAuthenticated,
   can(USER_TYPES.ADMIN, USER_TYPES.OPERATOR, USER_TYPES.SELLER),
   new SalesInsightsController().handle,
+);
+router.get(
+  "/ai/search",
+  isAuthenticated,
+  can(USER_TYPES.ADMIN, USER_TYPES.OPERATOR, USER_TYPES.SELLER),
+  new SemanticSearchController().search,
+);
+router.get(
+  "/ai/search/status",
+  isAuthenticated,
+  can(USER_TYPES.ADMIN, USER_TYPES.OPERATOR, USER_TYPES.SELLER),
+  new SemanticSearchController().status,
+);
+router.post(
+  "/ai/search/reindex",
+  isAuthenticated,
+  can(USER_TYPES.ADMIN, USER_TYPES.OPERATOR),
+  new SemanticSearchController().reindex,
 );
 
 export { router };

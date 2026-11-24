@@ -810,6 +810,134 @@
         }
       }
     },
+    "/v1/ai/search": {
+      "get": {
+        "tags": [
+          "AI"
+        ],
+        "description": "Smart product search by meaning (embeddings). The query is turned into a vector with Amazon Titan Text Embeddings V2 and compared with the indexed products (vectors stored in SQLite). Repeated queries are cached in memory. **Accessible to Administrators, Operators, and Sellers.**",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "description": "What the user is looking for (2 to 200 characters).",
+            "schema": {
+              "type": "string"
+            },
+            "example": "algo para assistir filmes"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Maximum results (default 12, max 50).",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseSemanticSearch"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid search, empty index, missing AWS credentials, Bedrock quotas at 0 or Bedrock error. The body is { error }."
+          }
+        }
+      }
+    },
+    "/v1/ai/search/status": {
+      "get": {
+        "tags": [
+          "AI"
+        ],
+        "description": "How many products are indexed for the smart search. **Accessible to Administrators, Operators, and Sellers.**",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseSearchIndexStatus"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/ai/search/reindex": {
+      "post": {
+        "tags": [
+          "AI"
+        ],
+        "description": "Creates or updates the embeddings of all products. Products whose text did not change are skipped unless force is true. Products are also reindexed automatically when created or edited. **Accessible to Administrators and Operators.**",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "force": {
+                    "type": "boolean",
+                    "default": false
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "total": {
+                      "type": "number"
+                    },
+                    "indexed": {
+                      "type": "number"
+                    },
+                    "unchanged": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "$ref": "#/components/schemas/ResponseSearchIndexStatus"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid search, empty index, missing AWS credentials, Bedrock quotas at 0 or Bedrock error. The body is { error }."
+          }
+        }
+      }
+    },
     "/v1/sales": {
       "get": {
         "tags": [
@@ -1402,6 +1530,74 @@
                 "type": "number"
               }
             }
+          }
+        }
+      },
+      "ResponseSemanticSearch": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string"
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/ResponseCreateProduct"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "category": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "score": {
+                      "type": "number",
+                      "description": "Cosine similarity from 0 to 1."
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "indexed": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          },
+          "cached": {
+            "type": "boolean"
+          },
+          "model": {
+            "type": "string"
+          }
+        }
+      },
+      "ResponseSearchIndexStatus": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "number"
+          },
+          "indexed": {
+            "type": "number"
+          },
+          "missing": {
+            "type": "number"
+          },
+          "model": {
+            "type": "string",
+            "example": "amazon.titan-embed-text-v2:0"
           }
         }
       },

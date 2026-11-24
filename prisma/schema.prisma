@@ -59,8 +59,22 @@ model Product {
   category_id String
   items       Item[]
   sales       Sale[]
+  embedding   ProductEmbedding?
 
   @@map("products")
+}
+
+model ProductEmbedding {
+  product_id String   @id
+  model      String
+  text_hash  String
+  dimensions Int
+  vector     Bytes
+  updated_at DateTime @default(now()) @updatedAt
+
+  product Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
+
+  @@map("product_embeddings")
 }
 
 model Sale {
