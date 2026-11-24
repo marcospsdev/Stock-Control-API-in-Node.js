@@ -24,6 +24,8 @@ import { ListSalesController } from "./controllers/sale/ListSalesController";
 import { RemoveSaleController } from "./controllers/sale/RemoveSaleController";
 import { StockAssistantController } from "./controllers/ai/StockAssistantController";
 import { ProductSuggestionController } from "./controllers/ai/ProductSuggestionController";
+import { SalesInsightsController } from "./controllers/ai/SalesInsightsController";
+import { RestockForecastController } from "./controllers/sale/RestockForecastController";
 
 const router = Router();
 const upload = multer(uploadConfig.upload("./tmp"));
@@ -153,6 +155,12 @@ router.get(
   can(USER_TYPES.ADMIN, USER_TYPES.OPERATOR, USER_TYPES.SELLER),
   new ListSalesController().handle,
 );
+router.get(
+  "/sales/restock-forecast",
+  isAuthenticated,
+  can(USER_TYPES.ADMIN, USER_TYPES.OPERATOR, USER_TYPES.SELLER),
+  new RestockForecastController().handle,
+);
 router.delete(
   "/sales/:sale_id",
   isAuthenticated,
@@ -173,6 +181,12 @@ router.post(
   can(USER_TYPES.ADMIN, USER_TYPES.OPERATOR),
   uploadToMemory.single("file"),
   new ProductSuggestionController().handle,
+);
+router.post(
+  "/ai/sales-insights",
+  isAuthenticated,
+  can(USER_TYPES.ADMIN, USER_TYPES.OPERATOR, USER_TYPES.SELLER),
+  new SalesInsightsController().handle,
 );
 
 export { router };

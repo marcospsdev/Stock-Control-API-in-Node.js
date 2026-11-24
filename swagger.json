@@ -768,6 +768,48 @@
         }
       }
     },
+    "/v1/ai/sales-insights": {
+      "post": {
+        "tags": [
+          "AI"
+        ],
+        "description": "Sales and stock analysis written by Amazon Bedrock (default Nova Micro) from the numbers already calculated by the restock forecast. **Accessible to Administrators, Operators, and Sellers.**",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "days": {
+                    "type": "integer",
+                    "description": "7, 30 (default) or 90."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseSalesInsights"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing AWS credentials, Bedrock quotas at 0 or Bedrock error. The body is { error }."
+          }
+        }
+      }
+    },
     "/v1/sales": {
       "get": {
         "tags": [
@@ -814,6 +856,50 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ResponseListSales"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/sales/restock-forecast": {
+      "get": {
+        "tags": [
+          "Sales"
+        ],
+        "description": "Restock forecast calculated from the sales history (no AI): sales pace per product, days of stock left and units to restock to cover the coverage period. Lists only products out of stock, critical (up to 7 days) or low. **Accessible to Administrators, Operators, and Sellers.**",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "days",
+            "in": "query",
+            "required": false,
+            "description": "Sales period used to measure the pace: 7, 30 (default) or 90.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "coverage_days",
+            "in": "query",
+            "required": false,
+            "description": "How many days the stock should last after restocking (7 to 90, default 30).",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseRestockForecast"
                 }
               }
             }
@@ -1161,6 +1247,150 @@
           "region": {
             "type": "string",
             "example": "us-east-2"
+          },
+          "usage": {
+            "type": "object",
+            "properties": {
+              "inputTokens": {
+                "type": "number"
+              },
+              "outputTokens": {
+                "type": "number"
+              }
+            }
+          }
+        }
+      },
+      "ResponseRestockForecast": {
+        "type": "object",
+        "properties": {
+          "periodDays": {
+            "type": "number"
+          },
+          "coverageDays": {
+            "type": "number"
+          },
+          "since": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "current": {
+            "type": "object",
+            "properties": {
+              "sales": {
+                "type": "number"
+              },
+              "units": {
+                "type": "number"
+              },
+              "revenue": {
+                "type": "number"
+              }
+            }
+          },
+          "previous": {
+            "type": "object",
+            "properties": {
+              "sales": {
+                "type": "number"
+              },
+              "units": {
+                "type": "number"
+              },
+              "revenue": {
+                "type": "number"
+              }
+            }
+          },
+          "counts": {
+            "type": "object",
+            "properties": {
+              "out": {
+                "type": "number"
+              },
+              "critical": {
+                "type": "number"
+              },
+              "low": {
+                "type": "number"
+              }
+            }
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "product_id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "category": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "stock": {
+                  "type": "number"
+                },
+                "unitsSold": {
+                  "type": "number"
+                },
+                "dailyRate": {
+                  "type": "number"
+                },
+                "daysLeft": {
+                  "type": "number",
+                  "nullable": true,
+                  "description": "Null when the product had no sales in the period."
+                },
+                "suggestedRestock": {
+                  "type": "number"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "out",
+                    "critical",
+                    "low"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "ResponseSalesInsights": {
+        "type": "object",
+        "properties": {
+          "periodDays": {
+            "type": "number"
+          },
+          "headline": {
+            "type": "string"
+          },
+          "insights": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "actions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "generatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "model": {
+            "type": "string"
+          },
+          "region": {
+            "type": "string"
           },
           "usage": {
             "type": "object",
