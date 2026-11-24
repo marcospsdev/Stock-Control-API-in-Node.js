@@ -681,6 +681,43 @@
         }
       }
     },
+    "/v1/ai/assistant": {
+      "post": {
+        "tags": [
+          "AI"
+        ],
+        "description": "Stock assistant powered by Amazon Bedrock (Converse API with tool use). The model answers in Portuguese and queries products, stock and sales through read-only tools. Needs AWS credentials in .env.aws. **Accessible to Administrators, Operators, and Sellers.**",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "description": "Conversation history (up to the last 10 messages, 2000 characters each). The last message must be from the user.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestStockAssistant"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseStockAssistant"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid messages, missing AWS credentials, Bedrock quotas at 0 or Bedrock error. The body is { error }."
+          }
+        }
+      }
+    },
     "/v1/sales": {
       "get": {
         "tags": [
@@ -966,6 +1003,81 @@
         "properties": {
           "amount": {
             "type": "number"
+          }
+        }
+      },
+      "RequestStockAssistant": {
+        "type": "object",
+        "required": [
+          "messages"
+        ],
+        "properties": {
+          "messages": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "role",
+                "content"
+              ],
+              "properties": {
+                "role": {
+                  "type": "string",
+                  "enum": [
+                    "user",
+                    "assistant"
+                  ]
+                },
+                "content": {
+                  "type": "string",
+                  "maxLength": 2000
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "messages": [
+            {
+              "role": "user",
+              "content": "Quais produtos estão com estoque baixo?"
+            }
+          ]
+        }
+      },
+      "ResponseStockAssistant": {
+        "type": "object",
+        "properties": {
+          "reply": {
+            "type": "string"
+          },
+          "model": {
+            "type": "string",
+            "example": "us.amazon.nova-micro-v1:0"
+          },
+          "region": {
+            "type": "string",
+            "example": "us-east-2"
+          },
+          "toolsUsed": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "list_products"
+            ]
+          },
+          "usage": {
+            "type": "object",
+            "properties": {
+              "inputTokens": {
+                "type": "number"
+              },
+              "outputTokens": {
+                "type": "number"
+              }
+            }
           }
         }
       },

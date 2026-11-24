@@ -22,6 +22,7 @@ import { RemoveProductController } from "./controllers/product/RemoveProductCont
 import { SaleProductController } from "./controllers/sale/SaleProductController";
 import { ListSalesController } from "./controllers/sale/ListSalesController";
 import { RemoveSaleController } from "./controllers/sale/RemoveSaleController";
+import { StockAssistantController } from "./controllers/ai/StockAssistantController";
 
 const router = Router();
 const upload = multer(uploadConfig.upload("./tmp"));
@@ -155,6 +156,14 @@ router.delete(
   isAuthenticated,
   can(USER_TYPES.ADMIN, USER_TYPES.OPERATOR),
   new RemoveSaleController().handle,
+);
+
+// AI Route
+router.post(
+  "/ai/assistant",
+  isAuthenticated,
+  can(USER_TYPES.ADMIN, USER_TYPES.OPERATOR, USER_TYPES.SELLER),
+  new StockAssistantController().handle,
 );
 
 export { router };
