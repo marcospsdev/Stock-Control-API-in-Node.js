@@ -938,6 +938,88 @@
         }
       }
     },
+    "/v1/ai/invoice-extraction": {
+      "post": {
+        "tags": [
+          "AI"
+        ],
+        "description": "Reads a supplier invoice or order (PDF or image) with a Bedrock model that understands documents (default Amazon Nova Lite) and returns the header and the product lines, each one matched to an existing product when the AI is confident. Nothing is saved: the user reviews the lines and then calls POST /v1/stock-entries. **Accessible to Administrators and Operators.**",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "PDF, JPG, PNG or WEBP up to 4.5 MB."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseInvoiceExtraction"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing or unsupported file, no products found, missing AWS credentials, Bedrock quotas at 0 or Bedrock error. The body is { error }."
+          }
+        }
+      }
+    },
+    "/v1/stock-entries": {
+      "post": {
+        "tags": [
+          "Products"
+        ],
+        "description": "Adds units to the stock of one or more products in a single transaction and records each entry in the stock entry history. Repeated products are summed. **Accessible to Administrators and Operators.**",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestStockEntry"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseStockEntry"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid items or product not found. The body is { error }."
+          }
+        }
+      }
+    },
     "/v1/sales": {
       "get": {
         "tags": [
@@ -1598,6 +1680,153 @@
           "model": {
             "type": "string",
             "example": "amazon.titan-embed-text-v2:0"
+          }
+        }
+      },
+      "ResponseInvoiceExtraction": {
+        "type": "object",
+        "properties": {
+          "supplier": {
+            "type": "string",
+            "nullable": true
+          },
+          "invoice_number": {
+            "type": "string",
+            "nullable": true
+          },
+          "issue_date": {
+            "type": "string",
+            "nullable": true,
+            "example": "2026-11-20"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "description": {
+                  "type": "string"
+                },
+                "quantity": {
+                  "type": "integer",
+                  "nullable": true
+                },
+                "unit_price": {
+                  "type": "number",
+                  "nullable": true
+                },
+                "product_id": {
+                  "type": "string",
+                  "nullable": true,
+                  "description": "Existing product matched by the AI, or null."
+                },
+                "product_name": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "current_stock": {
+                  "type": "integer",
+                  "nullable": true
+                }
+              }
+            }
+          },
+          "matched": {
+            "type": "integer"
+          },
+          "model": {
+            "type": "string"
+          },
+          "region": {
+            "type": "string"
+          },
+          "usage": {
+            "type": "object",
+            "properties": {
+              "inputTokens": {
+                "type": "number"
+              },
+              "outputTokens": {
+                "type": "number"
+              }
+            }
+          }
+        }
+      },
+      "RequestStockEntry": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "type": "object",
+              "required": [
+                "product_id",
+                "amount"
+              ],
+              "properties": {
+                "product_id": {
+                  "type": "string"
+                },
+                "amount": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 100000
+                }
+              }
+            }
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "manual",
+              "invoice"
+            ],
+            "default": "manual"
+          },
+          "reference": {
+            "type": "string",
+            "description": "Invoice number or another reference (up to 100 characters)."
+          }
+        }
+      },
+      "ResponseStockEntry": {
+        "type": "object",
+        "properties": {
+          "source": {
+            "type": "string"
+          },
+          "reference": {
+            "type": "string",
+            "nullable": true
+          },
+          "totalUnits": {
+            "type": "integer"
+          },
+          "products": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "amount": {
+                  "type": "integer",
+                  "description": "Stock after the entry."
+                },
+                "added": {
+                  "type": "integer"
+                }
+              }
+            }
           }
         }
       },

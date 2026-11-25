@@ -26,6 +26,8 @@ import { StockAssistantController } from "./controllers/ai/StockAssistantControl
 import { ProductSuggestionController } from "./controllers/ai/ProductSuggestionController";
 import { SalesInsightsController } from "./controllers/ai/SalesInsightsController";
 import { SemanticSearchController } from "./controllers/ai/SemanticSearchController";
+import { InvoiceExtractionController } from "./controllers/ai/InvoiceExtractionController";
+import { StockEntryController } from "./controllers/product/StockEntryController";
 import { RestockForecastController } from "./controllers/sale/RestockForecastController";
 
 const router = Router();
@@ -206,6 +208,21 @@ router.post(
   isAuthenticated,
   can(USER_TYPES.ADMIN, USER_TYPES.OPERATOR),
   new SemanticSearchController().reindex,
+);
+router.post(
+  "/ai/invoice-extraction",
+  isAuthenticated,
+  can(USER_TYPES.ADMIN, USER_TYPES.OPERATOR),
+  uploadToMemory.single("file"),
+  new InvoiceExtractionController().handle,
+);
+
+// Stock Entry Route
+router.post(
+  "/stock-entries",
+  isAuthenticated,
+  can(USER_TYPES.ADMIN, USER_TYPES.OPERATOR),
+  new StockEntryController().handle,
 );
 
 export { router };

@@ -60,8 +60,23 @@ model Product {
   items       Item[]
   sales       Sale[]
   embedding   ProductEmbedding?
+  stockEntries StockEntry[]
 
   @@map("products")
+}
+
+model StockEntry {
+  id           String   @id @default(uuid())
+  product_name String
+  amount       Int
+  source       String
+  reference    String?
+  created_at   DateTime @default(now())
+
+  product    Product? @relation(fields: [product_id], references: [id], onDelete: SetNull)
+  product_id String?
+
+  @@map("stock_entries")
 }
 
 model ProductEmbedding {
